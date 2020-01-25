@@ -9,7 +9,7 @@ with open("README.md", "r") as fh:
 
 setup(
 	name='pingzeex',
-	version='0.0.3',
+	version='0.0.4',
 	description='Pingzeex Python Library',
 	py_modules=["pingzeex"],
 	package_dir={'':'src'},
