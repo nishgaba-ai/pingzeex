@@ -3,8 +3,7 @@ import json
 from datetime import datetime
 
 
-
-class Helloworld:
+class PingzeeClient:
     """
         Tests the functionality of handshaking for Helloworld
     """
@@ -17,7 +16,8 @@ class Helloworld:
         self.transport = "tcp"
 
         self.topic =  self._node_uid + "/dkcs/dead/node"
-        self.rx_uid = "0"
+        self.con_name = None
+        self.rx_uid = None
         self.payload = {
             "type" : 2,
             "data":{
@@ -78,20 +78,43 @@ class Helloworld:
 
 
     def publish(self):
-        print("Custom Publish Called")
-        print(self.json_data)
         self.client.publish("pingzee/dkcs/auth/fullflow", self.json_data)
 
     def subscribe(self):
-        print("Custom Sub Called")
-        print(type(self._node_uid+"/pingzee/dkcs/auth/response"))
-        print(self.client.subscribe(self._node_uid+"/pingzee/dkcs/auth/response"))
-        print("Custom Sub Done")
+        self.client.subscribe(self._node_uid+"/pingzee/dkcs/auth/response")
 
+    def topic_subscribe(self):
+        self.client.subscribe(self.rx_uid + "/" + self._node_uid + "/pingzee/data/rx" )
     # The callback for when a PUBLISH message is received from the server.
     def on_message(self, client, userdata, msg):
-        print(msg.topic+" "+str(msg.payload))
+        if msg.topic == (self._node_uid+"/pingzee/dkcs/auth/response"):
 
+            test_res = json.loads(msg.payload.decode('utf-8'))
+            self.con_name = test_res["data"]["con_name"]
+            self.rx_uid = test_res["data"]["rx_uid"]
+            self.topic_subscribe()
+
+
+        elif msg.topic == self.rx_uid + "/" + self._node_uid + "/pingzee/data/rx":
+            res = json.loads(msg.payload)
+            print(res)
+
+
+    def send(self, message, channel, recipient):
+
+        payload = {
+            "type" : 1,
+            "data":{
+                "message": message,
+                "uid": self._node_uid,
+            },
+            "channel": channel,
+            "to": None,
+            "from": None
+
+        }
+
+        self.client.publish()
     def run(self):
         self.will_set()
         #self.set_options()
@@ -99,8 +122,5 @@ class Helloworld:
         self.client.loop_forever()
 
 
-if __name__ == "__main__":
-    t = Helloworld()
-    t.run()
 
 

@@ -9,9 +9,9 @@ with open("README.md", "r") as fh:
 
 setup(
 	name='pingzeex',
-	version='0.0.1',
+	version='0.0.2',
 	description='Pingzeex Python Library',
-	py_modules=["test"],
+	py_modules=["main"],
 	package_dir={'':'src'},
 	classifiers=[
 		"Programming Language :: Python :: 3",
