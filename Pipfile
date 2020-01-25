@@ -1,0 +1,16 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+pytest = ">=3.7"
+twine = "*"
+v = {editable = true,version = "*"}
+
+[packages]
+pingzeex = {editable = true,path = "."}
+twine = "*"
+
+[requires]
+python_version = "3.6"
