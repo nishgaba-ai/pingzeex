@@ -1,7 +1,7 @@
 import paho.mqtt.client as mqtt
 import json
 from datetime import datetime
-
+import uuid
 
 class PingzeeClient:
     """
@@ -18,6 +18,10 @@ class PingzeeClient:
         self.topic =  self._node_uid + "/dkcs/dead/node"
         self.con_name = None
         self.rx_uid = None
+        self.received_data = None
+        self.handshake_data = None
+
+
         self.payload = {
             "type" : 2,
             "data":{
@@ -90,6 +94,7 @@ class PingzeeClient:
         if msg.topic == (self._node_uid+"/pingzee/dkcs/auth/response"):
 
             test_res = json.loads(msg.payload.decode('utf-8'))
+            self.handshake_data = test_res
             self.con_name = test_res["data"]["con_name"]
             self.rx_uid = test_res["data"]["rx_uid"]
             self.topic_subscribe()
@@ -97,7 +102,8 @@ class PingzeeClient:
 
         elif msg.topic == self.rx_uid + "/" + self._node_uid + "/pingzee/data/rx":
             res = json.loads(msg.payload)
-            print(res)
+            #print(res)
+            self.received_data = res
 
 
     def send(self, message, channel, recipient):
@@ -115,7 +121,11 @@ class PingzeeClient:
         }
 
         self.client.publish()
-    def run(self):
+    def run(self, node_key):
+        self._node_key = node_key
+        self._node_uid = uuid.uuid1()
+
+
         self.will_set()
         #self.set_options()
         self.connect()
